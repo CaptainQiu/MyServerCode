@@ -7,13 +7,13 @@
 #include<netinet/in.h>
 
 #define DEFAULT_PORT 8000
-#define MAXLINE 1024
+#define BUFFER_SIZE 1024
 
 int main(int argc, char *argv[])
 {
 	int socket_fd, connetc_fd;
 	struct sockaddr_in svaddr;
-	char buff[MAXLINE];
+	char buff[BUFFER_SIZE];
 	int n;
 
 	//´´½¨socket
@@ -36,7 +36,29 @@ int main(int argc, char *argv[])
 
 	if (listen(socket_fd, 10) == -1)
 	{
-		pri
+		printf("Server Listen error: %s(errno: %d)\n",strerror(errno),errno);
+		exit(0);
+	}
+	
+	while (1)
+	{
+		struct sockaddr_in client_addr;
+		socklen_t length = sizeof(client_addr);
+		int new_server_socket = accept(socket_fd, (struct sockaddr*)&client_addr,
+			&length);
+		if (new_server_socket < 0)
+		{
+			printf("Server Accept Error:%s(errno:%d)\n", strerror(errno), errno);
+			exit(0);
+		}
+		bzero(buff, BUFFER_SIZE);
+		length = recv(new_server_socket, buff, BUFFER_SIZE, 0);
+		if (length < 0)
+		{
+			printf("Server Recieve Data Error:%s(errno:%d)\n", strerror(errno), errno);
+			exit(0);
+		}
+
 	}
 
 
